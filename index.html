@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#101114">
+  <meta name="color-scheme" content="dark">
+  <meta
+    name="description"
+    content="Lyrics Library — an offline-first personal multilingual lyrics archive."
+  >
+  <title>Lyrics Library</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- Mobile / tablet top bar -->
+    <header class="topbar">
+      <button
+        id="mobileMenuBtn"
+        class="icon-btn mobile-only"
+        type="button"
+        aria-label="Open navigation"
+        title="Open navigation"
+      >☰</button>
+
+      <div class="brand">
+        <div class="brand-icon">♪</div>
+        <div>
+          <div class="brand-name">Lyrics Library</div>
+          <div class="brand-subtitle">Offline archive</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="topSearchBtn" class="icon-btn" type="button" aria-label="Search" title="Search">⌕</button>
+        <button id="addSongTopBtn" class="primary-btn" type="button">＋ <span>Add Song</span></button>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-scroll">
+
+          <button id="newSongBtn" class="new-song-btn" type="button">
+            <span class="new-song-icon">＋</span>
+            <span>New Song</span>
+          </button>
+
+          <nav class="nav-section" aria-label="Main navigation">
+            <button class="nav-item active" data-view="dashboard" type="button">
+              <span>⌂</span>
+              <span>Dashboard</span>
+            </button>
+
+            <button class="nav-item" data-view="library" type="button">
+              <span>▤</span>
+              <span>All Songs</span>
+              <span id="navSongCount" class="nav-count">0</span>
+            </button>
+
+            <button class="nav-item" data-view="favorites" type="button">
+              <span>★</span>
+              <span>Favorites</span>
+              <span id="navFavoriteCount" class="nav-count">0</span>
+            </button>
+
+            <button class="nav-item" data-view="pinned" type="button">
+              <span>⌖</span>
+              <span>Pinned</span>
+              <span id="navPinnedCount" class="nav-count">0</span>
+            </button>
+          </nav>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-heading">TOOLS</div>
+
+          <nav class="nav-section">
+            <button class="nav-item" data-action="search-history" type="button">
+              <span>◷</span>
+              <span>Search History</span>
+            </button>
+
+            <button class="nav-item" data-action="backup" type="button">
+              <span>⇩</span>
+              <span>Backup / Restore</span>
+            </button>
+          </nav>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-heading">RECENTLY VIEWED</div>
+          <div id="sidebarRecent" class="sidebar-recent">
+            <div class="empty-sidebar">Nothing viewed yet</div>
+          </div>
+
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="storage-status">
+            <span class="status-dot"></span>
+            <span>Local database</span>
+          </div>
+          <div id="storageSize" class="storage-size">IndexedDB</div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+
+        <!-- Global search -->
+        <section id="searchArea" class="search-area">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input
+              id="globalSearch"
+              type="search"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Search title, artist, alias, lyrics, translation..."
+              aria-label="Search songs"
+            >
+            <kbd>/</kbd>
+            <button
+              id="clearSearchBtn"
+              class="clear-search"
+              type="button"
+              aria-label="Clear search"
+            >×</button>
+          </div>
+
+          <div id="searchHistoryDropdown" class="search-history-dropdown hidden">
+            <div class="dropdown-title">
+              <span>Recent Searches</span>
+              <button id="clearSearchHistoryBtn" type="button">Clear</button>
+            </div>
+            <div id="searchHistoryList"></div>
+          </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboardView" class="view active-view">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">YOUR COLLECTION</div>
+              <h1>Lyrics Library</h1>
+              <p>Everything you love, available offline.</p>
+            </div>
+            <button id="dashboardAddBtn" class="primary-btn desktop-add" type="button">
+              ＋ Add Song
+            </button>
+          </div>
+
+          <div class="stats-grid">
+            <button class="stat-card" data-stat-view="library" type="button">
+              <div class="stat-icon">♪</div>
+              <div>
+                <div class="stat-label">Total Songs</div>
+                <div id="statSongs" class="stat-value">0</div>
+              </div>
+            </button>
+
+            <button class="stat-card" data-stat-view="artists" type="button">
+              <div class="stat-icon artist-icon">♬</div>
+              <div>
+                <div class="stat-label">Artists</div>
+                <div id="statArtists" class="stat-value">0</div>
+              </div>
+            </button>
+
+            <button class="stat-card" data-stat-view="favorites" type="button">
+              <div class="stat-icon favorite-icon">★</div>
+              <div>
+                <div class="stat-label">Favorites</div>
+                <div id="statFavorites" class="stat-value">0</div>
+              </div>
+            </button>
+
+            <button class="stat-card" data-stat-view="pinned" type="button">
+              <div class="stat-icon pin-icon">⌖</div>
+              <div>
+                <div class="stat-label">Pinned</div>
+                <div id="statPinned" class="stat-value">0</div>
+              </div>
+            </button>
+          </div>
+
+          <div class="dashboard-columns">
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Most Viewed</h2>
+                  <p>Your frequently opened songs</p>
+                </div>
+                <button class="text-btn" data-open-view="library" type="button">View all</button>
+              </div>
+              <div id="mostViewedList" class="song-list dashboard-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Recently Viewed</h2>
+                  <p>Continue where you left off</p>
+                </div>
+                <button class="text-btn" data-open-view="library" type="button">View all</button>
+              </div>
+              <div id="recentViewedList" class="song-list dashboard-list"></div>
+            </section>
+          </div>
+
+          <section class="panel recent-search-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Recent Searches</h2>
+                <p>Jump back into your latest searches</p>
+              </div>
+              <button id="dashboardClearHistory" class="text-btn" type="button">Clear</button>
+            </div>
+            <div id="dashboardSearchHistory" class="search-chips"></div>
+          </section>
+
+          <section id="emptyDashboard" class="empty-state large-empty hidden">
+            <div class="empty-art">♪</div>
+            <h2>Your library is empty</h2>
+            <p>Add your first song. Everything is saved locally on this device.</p>
+            <button class="primary-btn" id="emptyAddBtn" type="button">＋ Add your first song</button>
+          </section>
+
+        </section>
+
+        <!-- Library -->
+        <section id="libraryView" class="view">
+
+          <div class="page-heading library-heading">
+            <div>
+              <div id="libraryEyebrow" class="eyebrow">LIBRARY</div>
+              <h1 id="libraryTitle">All Songs</h1>
+              <p id="librarySubtitle">Your complete lyrics collection.</p>
+            </div>
+          </div>
+
+          <div class="library-toolbar">
+            <div class="toolbar-left">
+              <div id="resultCount" class="result-count">0 songs</div>
+
+              <div id="activeFilterChips" class="active-filter-chips"></div>
+            </div>
+
+            <div class="toolbar-right">
+              <label class="select-wrap">
+                <span class="sr-only">Sort songs</span>
+                <select id="sortSelect">
+                  <option value="title">Title</option>
+                  <option value="artist">Artist</option>
+                  <option value="created_desc">Date Added</option>
+                  <option value="viewed_desc">Recently Viewed</option>
+                  <option value="views_desc">Most Viewed</option>
+                </select>
+              </label>
+
+              <div class="view-toggle" aria-label="Library view">
+                <button class="view-btn active" data-layout="list" type="button" title="List view">☷</button>
+                <button class="view-btn" data-layout="compact" type="button" title="Compact view">▤</button>
+                <button class="view-btn" data-layout="card" type="button" title="Card view">▦</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="libraryList" class="library-list list-layout"></div>
+
+          <div id="libraryEmpty" class="empty-state hidden">
+            <div class="empty-art">⌕</div>
+            <h2 id="libraryEmptyTitle">No songs found</h2>
+            <p id="libraryEmptyText">Try another search or add a new song.</p>
+            <button id="libraryEmptyBtn" class="primary-btn" type="button">＋ Add Song</button>
+          </div>
+
+        </section>
+
+        <!-- Search history -->
+        <section id="historyView" class="view">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">TOOLS</div>
+              <h1>Search History</h1>
+              <p>Searches are stored locally on this device.</p>
+            </div>
+            <button id="historyClearBtn" class="secondary-btn" type="button">Clear History</button>
+          </div>
+
+          <section class="panel">
+            <div id="fullSearchHistory" class="history-list"></div>
+          </section>
+
+        </section>
+
+        <!-- Backup -->
+        <section id="backupView" class="view">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">TOOLS</div>
+              <h1>Backup & Restore</h1>
+              <p>Keep a portable copy of your entire local library.</p>
+            </div>
+          </div>
+
+          <div class="backup-grid">
+
+            <section class="backup-card">
+              <div class="backup-icon">⇩</div>
+              <h2>Export Library</h2>
+              <p>
+                Download all songs, metadata, favorites, pins, and reading data
+                as <strong>lyrics_library.json</strong>.
+              </p>
+              <button id="exportBtn" class="primary-btn" type="button">⇩ Export Backup</button>
+            </section>
+
+            <section class="backup-card">
+              <div class="backup-icon">⇧</div>
+              <h2>Restore Library</h2>
+              <p>
+                Import a previously exported JSON backup. Existing songs with
+                matching IDs will be replaced.
+              </p>
+              <button id="importBtn" class="secondary-btn" type="button">⇧ Choose Backup</button>
+              <input id="importFile" type="file" accept="application/json,.json" hidden>
+            </section>
+
+          </div>
+
+          <section class="panel backup-info">
+            <h2>Offline-first storage</h2>
+            <p>
+              Your lyrics are stored in IndexedDB inside this browser. No account,
+              server, or internet connection is required.
+            </p>
+            <div class="backup-stats">
+              <div><span>Songs</span><strong id="backupSongCount">0</strong></div>
+              <div><span>Favorites</span><strong id="backupFavoriteCount">0</strong></div>
+              <div><span>Pinned</span><strong id="backupPinnedCount">0</strong></div>
+              <div><span>Searches</span><strong id="backupSearchCount">0</strong></div>
+            </div>
+          </section>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Song editor modal -->
+  <div id="editorModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <div class="modal-backdrop" data-close-modal="editorModal"></div>
+
+    <div class="modal-panel editor-panel">
+      <div class="modal-header">
+        <div>
+          <div class="eyebrow">SONG EDITOR</div>
+          <h2 id="editorTitle">Add Song</h2>
+        </div>
+        <button class="icon-btn close-modal" data-close-modal="editorModal" type="button" aria-label="Close">×</button>
+      </div>
+
+      <form id="songForm" class="song-form">
+        <input id="songId" type="hidden">
+
+        <div class="form-grid">
+          <div class="field field-wide">
+            <label for="titleInput">Title <span class="required">*</span></label>
+            <input
+              id="titleInput"
+              type="text"
+              maxlength="300"
+              autocomplete="off"
+              placeholder="e.g. 瞬き"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="artistInput">Artist</label>
+            <input
+              id="artistInput"
+              type="text"
+              maxlength="300"
+              autocomplete="off"
+              placeholder="e.g. DAZBEE"
+            >
+          </div>
+
+          <div class="field field-wide">
+            <label for="aliasesInput">
+              Aliases
+              <span class="field-hint">One alias per line</span>
+            </label>
+            <textarea
+              id="aliasesInput"
+              rows="4"
+              maxlength="2000"
+              placeholder="Mabataki&#10;Blink"
+            ></textarea>
+          </div>
+
+          <div class="field field-wide">
+            <label for="lyricsInput">Lyrics</label>
+            <textarea
+              id="lyricsInput"
+              class="lyrics-input"
+              rows="12"
+              placeholder="Paste the original lyrics here..."
+            ></textarea>
+          </div>
+
+          <div class="field field-wide">
+            <label for="translationInput">Translation</label>
+            <textarea
+              id="translationInput"
+              class="lyrics-input"
+              rows="10"
+              placeholder="Optional translation..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div id="duplicateWarning" class="duplicate-warning hidden">
+          <div class="duplicate-warning-icon">!</div>
+          <div>
+            <strong>Possible duplicate found</strong>
+            <p id="duplicateWarningText"></p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            id="deleteSongBtn"
+            class="danger-btn hidden"
+            type="button"
+          >Delete</button>
+
+          <div class="footer-spacer"></div>
+
+          <button class="secondary-btn" data-close-modal="editorModal" type="button">
+            Cancel
+          </button>
+          <button class="primary-btn" type="submit">
+            Save Song
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reader modal -->
+  <div id="readerModal" class="reader-modal hidden" role="dialog" aria-modal="true">
+
+    <header class="reader-toolbar">
+      <button id="readerBackBtn" class="icon-btn" type="button" aria-label="Close reader">←</button>
+
+      <div class="reader-title-area">
+        <div id="readerTitle" class="reader-title">Song</div>
+        <div id="readerArtist" class="reader-artist"></div>
+      </div>
+
+      <div class="reader-actions">
+        <button id="readerFontDown" class="icon-btn" type="button" title="Decrease font size">A−</button>
+        <button id="readerFontUp" class="icon-btn" type="button" title="Increase font size">A+</button>
+        <button id="readerCopyLyrics" class="icon-btn" type="button" title="Copy lyrics">⧉</button>
+        <button id="readerFullscreen" class="icon-btn" type="button" title="Fullscreen">⛶</button>
+        <button id="readerEdit" class="icon-btn" type="button" title="Edit song">✎</button>
+        <button id="readerFavorite" class="icon-btn" type="button" title="Favorite">☆</button>
+        <button id="readerPin" class="icon-btn" type="button" title="Pin">⌖</button>
+      </div>
+    </header>
+
+    <div class="reader-body">
+      <div class="reader-inner">
+
+        <div class="reader-meta">
+          <span id="readerViewCount"></span>
+          <span id="readerCreated"></span>
+        </div>
+
+        <div class="reader-section">
+          <div class="reader-section-heading">
+            <h3>Lyrics</h3>
+            <button id="readerCopyLyricsText" class="text-btn" type="button">Copy</button>
+          </div>
+          <pre id="readerLyrics" class="lyrics-text"></pre>
+          <div id="readerNoLyrics" class="reader-placeholder hidden">
+            No lyrics have been added.
+          </div>
+        </div>
+
+        <div id="translationSection" class="reader-section translation-section">
+          <div class="reader-section-heading">
+            <h3>Translation</h3>
+            <button id="readerCopyTranslation" class="text-btn" type="button">Copy</button>
+          </div>
+          <pre id="readerTranslation" class="lyrics-text"></pre>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Confirm dialog -->
+  <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-panel confirm-panel">
+      <div class="confirm-icon">?</div>
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p id="confirmText"></p>
+      <div class="modal-footer">
+        <button id="confirmCancel" class="secondary-btn" type="button">Cancel</button>
+        <button id="confirmOkay" class="danger-btn" type="button">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
