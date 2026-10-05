@@ -1897,3 +1897,88 @@ p {
     animation-duration: .01ms !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Lyrics Library — modern minimalist artwork / reader layer
+   -------------------------------------------------------------------------- */
+:root {
+  --bg: #0a0b0d;
+  --bg-raised: #0f1114;
+  --bg-panel: #121418;
+  --bg-panel-2: #171a1f;
+  --bg-hover: #1b1f25;
+  --bg-input: #0c0e11;
+  --border: rgba(255,255,255,.09);
+  --border-soft: rgba(255,255,255,.055);
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+
+.song-art.has-artwork,
+.sidebar-recent-art.has-artwork,
+.reader-artwork.has-artwork,
+.artwork-preview.has-artwork { background: #0c0e11; }
+
+.song-art img,
+.sidebar-recent-art img,
+.reader-artwork img,
+.artwork-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artwork-field { margin-top: 2px; }
+.artwork-editor { display:flex; align-items:center; gap:14px; }
+.artwork-preview {
+  width:84px; height:84px; flex:0 0 84px; display:grid; place-items:center;
+  overflow:hidden; border:1px solid var(--border); border-radius:14px;
+  background:linear-gradient(145deg,#1d2229,#101216); color:var(--accent); font-size:25px;
+}
+.artwork-editor-actions { min-width:0; }
+.artwork-upload-btn { display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.artwork-hint { margin:7px 0 0; color:var(--text-4); font-size:9px; line-height:1.5; }
+
+.reader-hero {
+  display:flex; align-items:center; gap:22px; padding:10px 0 34px;
+}
+.reader-artwork {
+  width:148px; height:148px; flex:0 0 148px; display:grid; place-items:center;
+  overflow:hidden; border-radius:20px; border:1px solid var(--border);
+  background:radial-gradient(circle at 30% 20%,rgba(215,255,66,.16),transparent 45%),linear-gradient(145deg,#1c2229,#0d0f12);
+  color:var(--accent); font-size:46px; font-weight:800; box-shadow:0 18px 50px rgba(0,0,0,.25);
+}
+.reader-hero-copy { min-width:0; }
+.reader-eyebrow { color:var(--accent); font-size:9px; font-weight:800; letter-spacing:.18em; }
+.reader-hero-copy h1 { margin:7px 0 5px; font-size:clamp(28px,4vw,48px); line-height:1.05; letter-spacing:-.035em; }
+.reader-hero-copy p { margin:0; color:var(--text-3); font-size:13px; }
+.reader-section-kicker { margin-bottom:3px; color:var(--text-4); font-size:8px; letter-spacing:.14em; text-transform:uppercase; }
+.reader-section-heading h3 { letter-spacing:.08em; }
+.reader-lyrics-section { padding:26px 26px 32px; border:1px solid var(--border-soft); border-radius:18px; background:rgba(255,255,255,.018); }
+.lyrics-text { font-weight:450; }
+.reader-modal .reader-toolbar { background:rgba(10,11,13,.88); }
+
+.library-list { box-shadow:0 12px 40px rgba(0,0,0,.10); }
+.card-layout .song-row { min-height:235px; }
+.card-layout .song-art { width:100%; height:150px; border-radius:12px; font-size:30px; }
+.card-layout .song-main { min-height:52px; }
+
+@media (max-width: 700px) {
+  .artwork-editor { align-items:flex-start; }
+  .reader-inner { width:min(100% - 24px, 900px); padding-top:20px; }
+  .reader-hero { gap:15px; padding-bottom:24px; }
+  .reader-artwork { width:96px; height:96px; flex-basis:96px; border-radius:15px; font-size:30px; }
+  .reader-hero-copy h1 { font-size:28px; }
+  .reader-lyrics-section { padding:20px 16px 24px; border-radius:15px; }
+  .reader-actions { gap:0; }
+  .reader-actions .icon-btn:nth-child(4) { display:none; }
+  .card-layout .song-art { height:130px; }
+}
+
+@media (max-width: 430px) {
+  .artwork-preview { width:70px; height:70px; flex-basis:70px; }
+  .reader-artwork { width:78px; height:78px; flex-basis:78px; }
+  .reader-hero-copy h1 { font-size:24px; }
+  .reader-lyrics-section { padding-left:14px; padding-right:14px; }
+}
