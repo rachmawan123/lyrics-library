@@ -367,8 +367,12 @@ async function putSong(song) {
 }
 
 async function addSong(song) {
+  // Omit an undefined inline key so IndexedDB can generate a new id.
+  const record = { ...song };
+  delete record.id;
+
   return idbRequest(
-    transaction(SONG_STORE, "readwrite").add(song)
+    transaction(SONG_STORE, "readwrite").add(record)
   );
 }
 
