@@ -423,6 +423,7 @@ const state = {
 
   currentSongId: null,
   readerSongId: null,
+  editorArtwork: "",
 
   readerFontSize: Number(
     localStorage.getItem("lyricsReaderFontSize") || 20
@@ -563,6 +564,7 @@ function normalizeSong(song) {
     aliases,
     lyrics: String(song.lyrics ?? ""),
     translation: String(song.translation ?? ""),
+    artwork: String(song.artwork ?? ""),
     favorite: Boolean(song.favorite),
     pinned: Boolean(song.pinned),
     created_at: song.created_at || now,
@@ -943,7 +945,7 @@ function renderSidebarRecent(songs) {
       data-open-song="${song.id}"
       title="${escapeHTML(song.title)}"
     >
-      <div class="sidebar-recent-art">♪</div>
+      ${song.artwork ? `<div class="sidebar-recent-art has-artwork"><img src="${song.artwork}" alt="" loading="lazy"></div>` : `<div class="sidebar-recent-art">♪</div>`}
       <div>
         <div class="sidebar-recent-title">${escapeHTML(song.title || "Untitled")}</div>
         <div class="sidebar-recent-artist">${escapeHTML(song.artist || "Unknown artist")}</div>
@@ -1096,6 +1098,14 @@ function renderActiveFilters() {
     .join("");
 }
 
+function renderArtwork(song, className = "song-art", label = "Artwork") {
+  const artwork = String(song?.artwork || "").trim();
+  if (artwork) {
+    return `<div class="${className} has-artwork" data-open-song="${song.id}" aria-label="${escapeHTML(label)}"><img src="${artwork}" alt="${escapeHTML(song.title || "Song artwork")}" loading="lazy"></div>`;
+  }
+  return `<div class="${className}" data-open-song="${song.id}" aria-label="${escapeHTML(label)}">♪</div>`;
+}
+
 function renderSongRow(song) {
   const title = song.title || "Untitled";
   const artist = song.artist || "Unknown artist";
@@ -1126,7 +1136,7 @@ function renderSongRow(song) {
 
   return `
     <article class="song-row" data-song-row="${song.id}">
-      <div class="song-art" data-open-song="${song.id}">♪</div>
+      ${renderArtwork(song, "song-art", "Open song")}
 
       <div class="song-main" data-open-song="${song.id}">
         <div class="song-title-line">
@@ -1358,6 +1368,8 @@ function openAddSong() {
   $("#aliasesInput").value = "";
   $("#lyricsInput").value = "";
   $("#translationInput").value = "";
+  state.editorArtwork = "";
+  renderArtworkPreview();
 
   $("#deleteSongBtn").classList.add("hidden");
   $("#duplicateWarning").classList.add("hidden");
@@ -1387,11 +1399,52 @@ async function openEditSong(id) {
     (song.aliases || []).join("\n");
   $("#lyricsInput").value = song.lyrics || "";
   $("#translationInput").value = song.translation || "";
+  state.editorArtwork = song.artwork || "";
+  renderArtworkPreview();
 
   $("#deleteSongBtn").classList.remove("hidden");
   $("#duplicateWarning").classList.add("hidden");
 
   openModal("editorModal");
+}
+
+function renderArtworkPreview() {
+  const preview = $("#artworkPreview");
+  const remove = $("#removeArtworkBtn");
+  if (!preview || !remove) return;
+  preview.innerHTML = state.editorArtwork
+    ? `<img src="${state.editorArtwork}" alt="Artwork preview">`
+    : "♪";
+  preview.classList.toggle("has-artwork", Boolean(state.editorArtwork));
+  remove.classList.toggle("hidden", !state.editorArtwork);
+}
+
+function optimizeArtwork(file, maxSize = 720, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith("image/")) {
+      reject(new Error("Please choose an image file."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const ctx = canvas.getContext("2d", { alpha: false });
+        ctx.fillStyle = "#111317";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      image.onerror = () => reject(new Error("Image could not be read."));
+      image.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error("Image could not be read."));
+    reader.readAsDataURL(file);
+  });
 }
 
 function getFormSong() {
@@ -1414,7 +1467,9 @@ function getFormSong() {
 
     lyrics: $("#lyricsInput").value,
 
-    translation: $("#translationInput").value
+    translation: $("#translationInput").value,
+
+    artwork: state.editorArtwork
   });
 }
 
@@ -1621,6 +1676,12 @@ function renderReader(song) {
 
   $("#readerArtist").textContent =
     song.artist || "Unknown artist";
+  $("#readerHeroTitle").textContent = song.title || "Untitled";
+  $("#readerHeroArtist").textContent = song.artist || "Unknown artist";
+  $("#readerArtwork").innerHTML = song.artwork
+    ? `<img src="${song.artwork}" alt="${escapeHTML(song.title || "Song artwork")}">`
+    : "♪";
+  $("#readerArtwork").classList.toggle("has-artwork", Boolean(song.artwork));
 
   $("#readerViewCount").textContent =
     `${song.view_count || 0} views`;
@@ -2177,6 +2238,26 @@ function bindEvents() {
       "input",
       debounce(updateDuplicateWarning, 180)
     );
+  });
+
+  $("#artworkInput").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      state.editorArtwork = await optimizeArtwork(file);
+      renderArtworkPreview();
+      showToast("Cover added.", "success");
+    } catch (error) {
+      console.error(error);
+      showToast("Could not use that image.", "error");
+    } finally {
+      event.target.value = "";
+    }
+  });
+
+  $("#removeArtworkBtn").addEventListener("click", () => {
+    state.editorArtwork = "";
+    renderArtworkPreview();
   });
 
   $("#deleteSongBtn").addEventListener(
