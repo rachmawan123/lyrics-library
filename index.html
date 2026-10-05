@@ -415,6 +415,19 @@
             ></textarea>
           </div>
 
+          <div class="field field-wide artwork-field">
+            <label>Cover / Artwork <span class="field-hint">Optional · automatically optimized for local storage</span></label>
+            <div class="artwork-editor">
+              <div id="artworkPreview" class="artwork-preview" aria-label="Artwork preview">♪</div>
+              <div class="artwork-editor-actions">
+                <label class="secondary-btn artwork-upload-btn" for="artworkInput">Choose image</label>
+                <input id="artworkInput" type="file" accept="image/*" hidden>
+                <button id="removeArtworkBtn" class="secondary-btn hidden" type="button">Remove cover</button>
+                <p class="artwork-hint">JPG, PNG, WEBP. The app resizes large images automatically.</p>
+              </div>
+            </div>
+          </div>
+
           <div class="field field-wide">
             <label for="lyricsInput">Lyrics</label>
             <textarea
@@ -489,14 +502,26 @@
     <div class="reader-body">
       <div class="reader-inner">
 
+        <div class="reader-hero">
+          <div id="readerArtwork" class="reader-artwork" aria-label="Song artwork">♪</div>
+          <div class="reader-hero-copy">
+            <div class="reader-eyebrow">NOW READING</div>
+            <h1 id="readerHeroTitle">Song</h1>
+            <p id="readerHeroArtist"></p>
+          </div>
+        </div>
+
         <div class="reader-meta">
           <span id="readerViewCount"></span>
           <span id="readerCreated"></span>
         </div>
 
-        <div class="reader-section">
+        <div class="reader-section reader-lyrics-section">
           <div class="reader-section-heading">
-            <h3>Lyrics</h3>
+            <div>
+              <div class="reader-section-kicker">Original</div>
+              <h3>Lyrics</h3>
+            </div>
             <button id="readerCopyLyricsText" class="text-btn" type="button">Copy</button>
           </div>
           <pre id="readerLyrics" class="lyrics-text"></pre>
