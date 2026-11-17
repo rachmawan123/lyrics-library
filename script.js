@@ -636,7 +636,7 @@ function sampleSongs() {
   ];
 }
 
-const SHARED_LIBRARY_PATH = "./library.json";
+const SHARED_LIBRARY_PATH = "./lyrics_library.json";
 
 async function fetchSharedLibrary() {
   const response = await fetch(SHARED_LIBRARY_PATH, { cache: "no-store" });
@@ -685,7 +685,7 @@ async function seedDatabaseIfEmpty() {
       return;
     }
   } catch (error) {
-    console.info("No published library.json found yet; using the starter library.", error);
+    console.info("No published lyrics_library.json found yet; using the starter library.", error);
   }
 
   for (const song of sampleSongs()) {
@@ -1887,8 +1887,8 @@ async function exportBackup() {
 
 async function exportSharedLibrary() {
   const songs = await getAllSongs();
-  downloadLibraryJSON(songs, "library.json");
-  showToast("Shared library exported. Upload library.json to your GitHub repository root.", "success");
+  downloadLibraryJSON(songs, "lyrics_library.json");
+  showToast("Shared library exported. Replace lyrics_library.json in your GitHub repository root.", "success");
 }
 
 async function refreshAppAfterLibraryChange() {
@@ -1922,7 +1922,7 @@ async function loadPublishedLibrary() {
     );
   } catch (error) {
     console.error(error);
-    showToast("Could not find library.json on GitHub. Upload it to the repository root first.", "error");
+    showToast("Could not find a valid lyrics_library.json on GitHub. Upload it to the repository root first.", "error");
   }
 }
 
