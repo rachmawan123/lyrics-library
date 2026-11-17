@@ -1307,11 +1307,18 @@ function renderFullHistory() {
 /* -------------------------------------------------------------------------- */
 
 function setActiveNav(view) {
-  $$(".nav-item[data-view]").forEach(button => {
-    button.classList.toggle(
-      "active",
-      button.dataset.view === view
-    );
+  const activeView = view === "library"
+    ? (state.libraryFilter === "favorites"
+      ? "favorites"
+      : state.libraryFilter === "pinned"
+        ? "pinned"
+        : "library")
+    : view;
+
+  $(".nav-item[data-view]").forEach(button => {
+    const active = button.dataset.view === activeView;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-current", active ? "page" : "false");
   });
 }
 
@@ -2101,6 +2108,11 @@ function bindEvents() {
         return;
       }
 
+      if (view === "library") {
+        setLibraryFilter("all");
+        return;
+      }
+
       showView(view);
     });
   });
@@ -2302,9 +2314,14 @@ function bindEvents() {
     });
   });
 
-  $$(".text-btn[data-open-view]").forEach(button => {
+  $(".text-btn[data-open-view]").forEach(button => {
     button.addEventListener("click", () => {
-      showView(button.dataset.openView);
+      const target = button.dataset.openView;
+      if (target === "library") {
+        setLibraryFilter("all");
+      } else {
+        showView(target);
+      }
     });
   });
 
