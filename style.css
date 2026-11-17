@@ -2179,3 +2179,234 @@ p {
   .shared-library-actions button { width: 100%; }
   .backup-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ==========================================================================
+   Responsive glass refresh — desktop, tablet and phone
+   ========================================================================== */
+:root {
+  --surface-glass: rgba(20, 23, 28, .78);
+  --surface-glass-strong: rgba(24, 28, 34, .92);
+  --line-glass: rgba(255,255,255,.075);
+  --shadow-soft: 0 16px 44px rgba(0,0,0,.20);
+}
+body {
+  background:
+    radial-gradient(ellipse at 82% -10%, rgba(130,150,170,.075), transparent 38%),
+    var(--bg);
+}
+.topbar {
+  background: rgba(10,12,15,.82);
+  border-bottom-color: var(--line-glass);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+}
+.sidebar {
+  background: rgba(14,16,20,.88);
+  border-right-color: var(--line-glass);
+  backdrop-filter: blur(22px) saturate(135%);
+  -webkit-backdrop-filter: blur(22px) saturate(135%);
+}
+.panel,
+.backup-card,
+.backup-info,
+.stat-card,
+.library-list,
+.search-box {
+  border-color: var(--line-glass);
+  box-shadow: var(--shadow-soft);
+}
+.panel,
+.backup-card,
+.backup-info {
+  background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 58%), var(--bg-panel);
+}
+.search-box {
+  border-radius: 13px;
+  background: var(--surface-glass);
+  backdrop-filter: blur(18px);
+}
+.nav-item,
+.icon-btn,
+.view-btn,
+.text-btn,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item {
+  min-height: 44px;
+  border-radius: 11px;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+.nav-item.active {
+  background: linear-gradient(110deg, rgba(215,255,66,.105), rgba(255,255,255,.025));
+  border-color: rgba(215,255,66,.13);
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(215,255,66,.7);
+  outline-offset: 2px;
+}
+.song-row {
+  transition: background .16s ease, border-color .16s ease;
+}
+.song-row:hover {
+  background: rgba(255,255,255,.025);
+}
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  min-height: 42px;
+  border-radius: 11px;
+}
+.primary-btn {
+  box-shadow: 0 5px 18px rgba(215,255,66,.10);
+}
+.modal-panel {
+  border-color: var(--line-glass);
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+}
+
+/* Tablet: use the full canvas and a slide-in navigation drawer. */
+@media (min-width: 721px) and (max-width: 1024px) {
+  :root { --topbar-height: 64px; }
+  .mobile-only { display: inline-grid !important; }
+  .topbar { padding-inline: 18px; }
+  .brand { width: auto; margin-left: 8px; }
+  .sidebar {
+    top: var(--topbar-height);
+    width: min(300px, 42vw);
+    transform: translateX(-102%);
+    transition: transform .22s ease;
+    box-shadow: 24px 0 70px rgba(0,0,0,.45);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  #app:has(.sidebar.mobile-open)::after {
+    content: "";
+    position: fixed;
+    z-index: 35;
+    inset: var(--topbar-height) 0 0;
+    background: rgba(0,0,0,.48);
+    backdrop-filter: blur(3px);
+  }
+  .main {
+    width: 100%;
+    margin-left: 0;
+    padding: 0 clamp(20px, 4vw, 42px) 48px;
+  }
+  .view { max-width: 900px; padding-top: 30px; }
+  .search-area { max-width: 900px; }
+  .stats-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+  .dashboard-columns { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .library-list.card-layout { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .song-row { min-height: 62px; }
+  .reader-inner { width: min(88%, 900px); }
+}
+
+/* Phone and compact tablet: larger controls, less cramped content. */
+@media (max-width: 720px) {
+  :root { --topbar-height: 62px; }
+  .topbar {
+    padding-inline: max(12px, env(safe-area-inset-left));
+    background: rgba(10,12,15,.88);
+  }
+  .mobile-only { display: inline-grid !important; }
+  .sidebar {
+    width: min(310px, 88vw);
+    border-right: 1px solid var(--line-glass);
+    background: rgba(15,18,23,.96);
+    backdrop-filter: blur(26px);
+  }
+  #app:has(.sidebar.mobile-open)::after {
+    content: "";
+    position: fixed;
+    z-index: 35;
+    inset: var(--topbar-height) 0 0;
+    background: rgba(0,0,0,.52);
+    backdrop-filter: blur(3px);
+  }
+  .main {
+    width: 100%;
+    margin: 0;
+    padding: 0 16px calc(32px + env(safe-area-inset-bottom));
+  }
+  .search-area { margin-top: 14px; }
+  .search-box {
+    height: 48px;
+    padding-inline: 14px;
+    border-radius: 14px;
+  }
+  .search-box input { font-size: 14px; }
+  .view { padding-top: 28px; }
+  .page-heading { align-items: center; gap: 12px; }
+  .page-heading h1 { font-size: clamp(25px, 6vw, 32px); }
+  .page-heading p { font-size: 13px; line-height: 1.5; }
+  .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .stat-card {
+    min-height: 82px;
+    padding: 13px;
+    border-radius: 14px;
+  }
+  .dashboard-columns { grid-template-columns: 1fr; gap: 12px; }
+  .panel { padding: 16px; border-radius: 15px; }
+  .library-toolbar { align-items: stretch; gap: 10px; }
+  .toolbar-left { overflow-x: auto; }
+  .toolbar-right { display:flex; justify-content:space-between; gap:8px; }
+  .select-wrap select { min-height: 42px; font-size: 12px; }
+  .view-toggle { min-height: 42px; align-items:center; }
+  .view-btn { width: 38px; height: 36px; }
+  .library-list.list-layout .song-row {
+    min-height: 72px;
+    padding: 10px 8px;
+  }
+  .song-actions { opacity: 1; }
+  .song-actions button,
+  .icon-btn { min-width: 42px; min-height: 42px; }
+  .backup-grid { grid-template-columns: 1fr; }
+  .reader-modal .reader-toolbar {
+    min-height: 62px;
+    padding-inline: 10px;
+    gap: 8px;
+  }
+  .reader-title-area { max-width: 42%; }
+  .reader-inner {
+    width: min(100% - 28px, 720px);
+    padding-top: 22px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+  .reader-hero { align-items:center; }
+  .reader-lyrics-section { padding: 22px 18px 28px; }
+  .lyrics-text {
+    font-size: max(19px, var(--reader-font-size));
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+  }
+  .modal-panel { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* Small phones: keep actions reachable and prevent horizontal overflow. */
+@media (max-width: 430px) {
+  .topbar { gap: 5px; }
+  .brand { gap: 8px; }
+  .brand-name { font-size: 13px; }
+  .brand-icon { width: 30px; height: 30px; }
+  .topbar-actions { gap: 4px; }
+  .main { padding-inline: 12px; }
+  .stats-grid { gap: 8px; }
+  .stat-card { min-height: 76px; padding: 10px; }
+  .stat-icon { width: 32px; height: 32px; }
+  .library-list.card-layout { grid-template-columns: 1fr; }
+  .page-heading h1 { font-size: 25px; }
+  .reader-title-area { max-width: 38%; }
+  .reader-hero { gap: 12px; }
+  .reader-artwork { width: 72px; height: 72px; flex-basis: 72px; }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .song-row,
+  .nav-item { transition: none !important; }
+}
