@@ -1982,3 +1982,200 @@ p {
   .reader-hero-copy h1 { font-size:24px; }
   .reader-lyrics-section { padding-left:14px; padding-right:14px; }
 }
+
+
+/* --------------------------------------------------------------------------
+   Backup & restore — refined publishing panel
+   -------------------------------------------------------------------------- */
+.backup-grid {
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.backup-card,
+.backup-info {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(255,255,255,.025), transparent 55%), var(--bg-panel);
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+.backup-card {
+  padding: 22px;
+  min-width: 0;
+}
+.backup-card h2,
+.backup-info h2 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.backup-card > p,
+.backup-info > p {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.backup-card .primary-btn,
+.backup-card .secondary-btn,
+.shared-library-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.backup-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg-panel-2);
+  color: var(--text-2);
+  font-size: 18px;
+}
+.shared-library-panel {
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.shared-library-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+.shared-library-mark {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(215,255,66,.18);
+  border-radius: 12px;
+  background: rgba(215,255,66,.07);
+  color: var(--accent);
+  font-size: 20px;
+}
+.shared-library-heading .eyebrow {
+  margin-bottom: 4px;
+}
+.shared-library-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.shared-library-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.shared-library-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+.shared-library-note strong {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+.shared-library-note span {
+  color: var(--text-4);
+  font-size: 10px;
+}
+.shared-library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.shared-library-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.shared-library-actions button span {
+  font-size: 15px;
+  line-height: 1;
+}
+.shared-library-actions button:disabled {
+  opacity: .55;
+  cursor: wait;
+  transform: none;
+}
+.shared-library-status {
+  margin: 12px 0 0 !important;
+  color: var(--text-4) !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+}
+.shared-library-steps {
+  display: grid;
+  grid-template-columns: 28px minmax(0,1fr);
+  align-items: start;
+  gap: 10px 12px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+}
+.shared-library-step-number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-4);
+  font-size: 9px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.shared-library-steps p {
+  margin: 4px 0 0;
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.shared-library-steps strong {
+  color: var(--text-2);
+  font-weight: 650;
+}
+.backup-stats {
+  gap: 10px;
+  margin-top: 18px;
+}
+.backup-stats > div {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 11px;
+  background: rgba(255,255,255,.018);
+}
+.backup-stats span {
+  display: block;
+  color: var(--text-4);
+  font-size: 10px;
+}
+.backup-stats strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) {
+  .shared-library-panel { padding: 18px; }
+  .shared-library-actions { display: grid; grid-template-columns: 1fr; }
+  .shared-library-actions button { width: 100%; }
+  .backup-grid { grid-template-columns: 1fr; }
+}
