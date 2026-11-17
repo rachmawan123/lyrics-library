@@ -43,7 +43,7 @@ On a brand-new browser profile, the app will automatically load `library.json` w
 This is **manual one-way publishing**, not automatic two-way cloud sync:
 
 - Each browser keeps its own editable IndexedDB library.
-- GitHub Pages serves the published `library.json) to all devices.
+- GitHub Pages serves the published `library.json` to all devices.
 - Changes made on a device are local until you export `library.json` and upload the new version to GitHub.
 - Other devices can then select **Load from GitHub** to receive the published updates.
 - GitHub Pages is static hosting, so the app cannot write changes back to the repository automatically without a separate authenticated backend or GitHub integration.
