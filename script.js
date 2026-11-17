@@ -1885,7 +1885,7 @@ async function exportBackup() {
   showToast(`${songs.length} songs exported as backup.`, "success");
 }
 
-async function exportSharedLibrary() {
+async async function exportSharedLibrary() {
   const songs = await getAllSongs();
   downloadLibraryJSON(songs, "lyrics_library.json");
   showToast("Shared library exported. Replace lyrics_library.json in your GitHub repository root.", "success");
