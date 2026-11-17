@@ -1315,7 +1315,7 @@ function setActiveNav(view) {
         : "library")
     : view;
 
-  $(".nav-item[data-view]").forEach(button => {
+  $$(".nav-item[data-view]").forEach(button => {
     const active = button.dataset.view === activeView;
     button.classList.toggle("active", active);
     button.setAttribute("aria-current", active ? "page" : "false");
@@ -2094,7 +2094,7 @@ function bindEvents() {
   /*
     Navigation.
   */
-  $$(".nav-item[data-view]").forEach(button => {
+  $$$(".nav-item[data-view]").forEach(button => {
     button.addEventListener("click", () => {
       const view = button.dataset.view;
 
@@ -2314,7 +2314,7 @@ function bindEvents() {
     });
   });
 
-  $(".text-btn[data-open-view]").forEach(button => {
+  $$(".text-btn[data-open-view]").forEach(button => {
     button.addEventListener("click", () => {
       const target = button.dataset.openView;
       if (target === "library") {
