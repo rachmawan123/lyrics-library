@@ -636,10 +636,57 @@ function sampleSongs() {
   ];
 }
 
+const SHARED_LIBRARY_PATH = "./library.json";
+
+async function fetchSharedLibrary() {
+  const response = await fetch(SHARED_LIBRARY_PATH, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Shared library unavailable (HTTP ${response.status}).`);
+
+  const backup = await response.json();
+  if (!backup || Number(backup.version) !== 1 || !Array.isArray(backup.songs)) {
+    throw new Error("The shared library file has an invalid format.");
+  }
+  return backup.songs.map(normalizeSong);
+}
+
+async function writeSongsToDatabase(songs, mode = "merge") {
+  return new Promise((resolve, reject) => {
+    const store = transaction(SONG_STORE, "readwrite");
+    const tx = store.transaction;
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error || new Error("Library update was cancelled."));
+
+    if (mode === "replace") store.clear();
+
+    for (const source of songs) {
+      const song = { ...source };
+      if (!Number.isSafeInteger(Number(song.id)) || Number(song.id) < 1) {
+        delete song.id;
+        store.add(song);
+      } else {
+        song.id = Number(song.id);
+        store.put(song);
+      }
+    }
+  });
+}
+
 async function seedDatabaseIfEmpty() {
   const songs = await getAllSongs();
-
   if (songs.length > 0) return;
+
+  try {
+    const sharedSongs = await fetchSharedLibrary();
+    if (sharedSongs.length) {
+      await writeSongsToDatabase(sharedSongs, "replace");
+      console.info(`Loaded ${sharedSongs.length} songs from the shared GitHub library.`);
+      return;
+    }
+  } catch (error) {
+    console.info("No published library.json found yet; using the starter library.", error);
+  }
 
   for (const song of sampleSongs()) {
     delete song.id;
@@ -1815,90 +1862,97 @@ async function copyText(text, successMessage) {
 /* Backup / restore                                                           */
 /* -------------------------------------------------------------------------- */
 
-async function exportBackup() {
-  const songs = await getAllSongs();
-
+function downloadLibraryJSON(songs, filename) {
   const backup = {
     version: 1,
     exported_at: new Date().toISOString(),
     songs: songs.map(song => normalizeSong(song))
   };
-
-  const blob = new Blob(
-    [JSON.stringify(backup, null, 2)],
-    { type: "application/json" }
-  );
-
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
-
   anchor.href = url;
-  anchor.download = "lyrics_library.json";
-
+  anchor.download = filename;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
-  showToast(
-    `${songs.length} songs exported.`,
-    "success"
-  );
+async function exportBackup() {
+  const songs = await getAllSongs();
+  downloadLibraryJSON(songs, "lyrics_library.json");
+  showToast(`${songs.length} songs exported as backup.`, "success");
+}
+
+async function exportSharedLibrary() {
+  const songs = await getAllSongs();
+  downloadLibraryJSON(songs, "library.json");
+  showToast("Shared library exported. Upload library.json to your GitHub repository root.", "success");
+}
+
+async function refreshAppAfterLibraryChange() {
+  await refreshSongs();
+  renderDashboard();
+  renderLibrary();
+  updateBackupStats();
+}
+
+async function loadPublishedLibrary() {
+  try {
+    const songs = await fetchSharedLibrary();
+    if (!songs.length) {
+      showToast("The published library is empty.", "error");
+      return;
+    }
+
+    askConfirm(
+      "Update from GitHub?",
+      `The published library contains ${songs.length} songs. Matching IDs will be updated; songs that exist only on this device will be kept.`,
+      async () => {
+        try {
+          await writeSongsToDatabase(songs, "merge");
+          await refreshAppAfterLibraryChange();
+          showToast(`Updated from GitHub: ${songs.length} published songs loaded.`, "success");
+        } catch (error) {
+          console.error(error);
+          showToast("Could not update the local library.", "error");
+        }
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    showToast("Could not find library.json on GitHub. Upload it to the repository root first.", "error");
+  }
 }
 
 async function importBackupFile(file) {
   if (!file) return;
 
   try {
-    const text = await file.text();
-    const backup = JSON.parse(text);
-
-    if (
-      !backup ||
-      Number(backup.version) !== 1 ||
-      !Array.isArray(backup.songs)
-    ) {
+    const backup = JSON.parse(await file.text());
+    if (!backup || Number(backup.version) !== 1 || !Array.isArray(backup.songs)) {
       throw new Error("Invalid backup format.");
     }
 
     const songs = backup.songs.map(normalizeSong);
-
     askConfirm(
       "Restore backup?",
-      `This backup contains ${songs.length} songs. Existing songs with matching IDs will be replaced.`,
+      `This backup contains ${songs.length} songs. Matching IDs will be replaced; songs not in the backup will remain. Continue?`,
       async () => {
-        for (const song of songs) {
-          if (!Number.isFinite(Number(song.id))) {
-            delete song.id;
-          }
-
-          if (song.id) {
-            await putSong(song);
-          } else {
-            await addSong(song);
-          }
+        try {
+          await writeSongsToDatabase(songs, "merge");
+          await refreshAppAfterLibraryChange();
+          showToast(`${songs.length} songs restored on this device.`, "success");
+        } catch (error) {
+          console.error(error);
+          showToast("Restore failed. Please check the backup and try again.", "error");
         }
-
-        await refreshSongs();
-
-        renderDashboard();
-        renderLibrary();
-        updateBackupStats();
-
-        showToast(
-          `${songs.length} songs restored.`,
-          "success"
-        );
       }
     );
   } catch (error) {
     console.error(error);
-
-    showToast(
-      "Could not import that backup file.",
-      "error"
-    );
+    showToast("Could not import that backup file. Check that it is a valid Lyrics Library JSON backup.", "error");
   }
 }
 
@@ -2515,6 +2569,9 @@ function bindEvents() {
     "click",
     exportBackup
   );
+
+  $("#exportSharedBtn").addEventListener("click", exportSharedLibrary);
+  $("#loadSharedBtn").addEventListener("click", loadPublishedLibrary);
 
   $("#importBtn").addEventListener(
     "click",
