@@ -2094,7 +2094,7 @@ function bindEvents() {
   /*
     Navigation.
   */
-  $(".nav-item[data-view]").forEach(button => {
+  $$(".nav-item[data-view]").forEach(button => {
     button.addEventListener("click", () => {
       const view = button.dataset.view;
 
