@@ -1885,10 +1885,28 @@ async function exportBackup() {
   showToast(`${songs.length} songs exported as backup.`, "success");
 }
 
-async async function exportSharedLibrary() {
-  const songs = await getAllSongs();
-  downloadLibraryJSON(songs, "lyrics_library.json");
-  showToast("Shared library exported. Replace lyrics_library.json in your GitHub repository root.", "success");
+async function setSharedLibraryStatus(message) {
+  const status = $("#sharedLibraryStatus");
+  if (status) status.textContent = message;
+}
+
+async function exportSharedLibrary() {
+  const button = $("#exportSharedBtn");
+  if (button) button.disabled = true;
+  setSharedLibraryStatus("Preparing your shared library file…");
+
+  try {
+    const songs = await getAllSongs();
+    downloadLibraryJSON(songs, "lyrics_library.json");
+    setSharedLibraryStatus(`Exported ${songs.length} songs. Upload the downloaded lyrics_library.json to the root of your GitHub repository.`);
+    showToast("Shared library exported. Replace lyrics_library.json in your GitHub repository root.", "success");
+  } catch (error) {
+    console.error(error);
+    setSharedLibraryStatus("Export failed. Please try again.");
+    showToast("Could not export the shared library.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 
 async function refreshAppAfterLibraryChange() {
@@ -1899,13 +1917,19 @@ async function refreshAppAfterLibraryChange() {
 }
 
 async function loadPublishedLibrary() {
+  const button = $("#loadSharedBtn");
+  if (button) button.disabled = true;
+  setSharedLibraryStatus("Connecting to GitHub and checking the published file…");
+
   try {
     const songs = await fetchSharedLibrary();
     if (!songs.length) {
+      setSharedLibraryStatus("The published lyrics_library.json is valid, but it contains no songs.");
       showToast("The published library is empty.", "error");
       return;
     }
 
+    setSharedLibraryStatus(`Found ${songs.length} published songs. Confirm the update to merge them into this device.`);
     askConfirm(
       "Update from GitHub?",
       `The published library contains ${songs.length} songs. Matching IDs will be updated; songs that exist only on this device will be kept.`,
@@ -1913,16 +1937,21 @@ async function loadPublishedLibrary() {
         try {
           await writeSongsToDatabase(songs, "merge");
           await refreshAppAfterLibraryChange();
+          setSharedLibraryStatus(`Updated successfully. ${songs.length} published songs were merged into this device.`);
           showToast(`Updated from GitHub: ${songs.length} published songs loaded.`, "success");
         } catch (error) {
           console.error(error);
+          setSharedLibraryStatus("The download worked, but saving the songs to this device failed.");
           showToast("Could not update the local library.", "error");
         }
       }
     );
   } catch (error) {
     console.error(error);
+    setSharedLibraryStatus("Could not load lyrics_library.json. Check that the file exists in the repository root and contains a valid backup.");
     showToast("Could not find a valid lyrics_library.json on GitHub. Upload it to the repository root first.", "error");
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
