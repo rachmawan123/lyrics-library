@@ -2757,9 +2757,9 @@ async function init() {
         ">
           <h1 style="margin-top:0">Lyrics Library</h1>
           <p style="color:#b6bac3;line-height:1.6">
-            The local database could not be opened.
-            Try opening this page in a modern browser with
-            IndexedDB enabled.
+            Lyrics Library could not start.
+            The error details are shown below. Your saved songs have not
+            been intentionally deleted or reset.
           </p>
           <p style="color:#7d828d;font-size:12px">
             ${escapeHTML(error.message)}
