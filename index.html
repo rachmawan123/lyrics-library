@@ -342,22 +342,42 @@
 
           </div>
 
-          <section class="panel backup-info">
-            <h2>Shared library · GitHub Pages</h2>
-            <p>
-              Keep one published <strong>lyrics_library.json</strong> in your GitHub repository.
-              New devices can load it, and you can publish updates by exporting this file
-              and replacing the repository copy. This is one-way publishing, not automatic
-              two-way sync.
-            </p>
-            <div class="backup-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
-              <button id="loadSharedBtn" class="secondary-btn" type="button">↻ Load from GitHub</button>
-              <button id="exportSharedBtn" class="primary-btn" type="button">⇧ Export for GitHub</button>
+          <section class="panel backup-info shared-library-panel">
+            <div class="shared-library-heading">
+              <div class="shared-library-mark" aria-hidden="true">↗</div>
+              <div>
+                <div class="eyebrow">PUBLISHING</div>
+                <h2>Shared library</h2>
+                <p class="shared-library-subtitle">Keep your collection available across devices with GitHub Pages.</p>
+              </div>
             </div>
-            <p class="muted" style="margin-top:12px">
-              To publish: export <strong>lyrics_library.json</strong>, then upload it to the
-              root of the <strong>lyrics-library</strong> repository on GitHub.
+
+            <div class="shared-library-note">
+              <strong>lyrics_library.json</strong>
+              <span>One published master file · one-way publishing · no automatic two-way sync</span>
+            </div>
+
+            <div class="backup-actions shared-library-actions">
+              <button id="loadSharedBtn" class="secondary-btn" type="button">
+                <span aria-hidden="true">↻</span> Load from GitHub
+              </button>
+              <button id="exportSharedBtn" class="primary-btn" type="button">
+                <span aria-hidden="true">⇧</span> Export for GitHub
+              </button>
+            </div>
+
+            <p id="sharedLibraryStatus" class="shared-library-status" role="status" aria-live="polite">
+              Load adds or updates published songs on this device. Export creates a JSON file you can upload to the repository.
             </p>
+
+            <div class="shared-library-steps">
+              <span class="shared-library-step-number">01</span>
+              <p>Export <strong>lyrics_library.json</strong> from the device with your latest songs.</p>
+              <span class="shared-library-step-number">02</span>
+              <p>Replace the file in the root of your <strong>lyrics-library</strong> GitHub repository and commit.</p>
+              <span class="shared-library-step-number">03</span>
+              <p>On another device, choose <strong>Load from GitHub</strong> to bring in the published collection.</p>
+            </div>
           </section>
 
           <section class="panel backup-info">
