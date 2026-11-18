@@ -1729,6 +1729,17 @@ async function openReader(id) {
 }
 
 function renderReader(song) {
+  const readerModal = $("#readerModal");
+  const artworkForBackdrop = /^data:image\//i.test(song.artwork || "")
+    ? song.artwork.replace(/["\\\r\n]/g, "")
+    : "";
+
+  readerModal.style.setProperty(
+    "--reader-artwork-image",
+    artworkForBackdrop ? `url("${artworkForBackdrop}")` : "none"
+  );
+  readerModal.classList.toggle("has-reader-artwork", Boolean(artworkForBackdrop));
+
   $("#readerTitle").textContent =
     song.title || "Untitled";
 
